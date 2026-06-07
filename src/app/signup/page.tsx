@@ -10,7 +10,7 @@ export default async function SignupPage({
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-6 py-24">
-      <div className="w-full max-w-md rounded-3xl border border-border bg-surface p-8 shadow-sm sm:p-10">
+      <div className="animate-fade-up w-full max-w-md rounded-3xl border border-border bg-surface p-8 shadow-soft sm:p-10">
         <h1 className="text-center text-3xl font-bold tracking-tight sm:text-4xl">Create your account</h1>
         <p className="mt-3 text-center text-lg text-muted">
           Get started with Branch.

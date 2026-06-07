@@ -34,7 +34,7 @@ export default async function DocumentPage({
         ← Back to your documents
       </Link>
 
-      <div className="mt-8 rounded-3xl border border-border bg-surface p-8 shadow-sm sm:p-12">
+      <div className="animate-fade-up mt-8 rounded-3xl border border-border bg-surface p-8 shadow-soft sm:p-12">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {doc.title}
         </h1>

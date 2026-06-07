@@ -42,10 +42,11 @@ export default async function DashboardPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 py-12 sm:py-16">
-      <div className="flex flex-col gap-2">
+      <div className="animate-fade-up flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">Your documents</h1>
         <p className="text-lg text-muted">
-          Upload a document to get a dyslexia-friendly version.
+          Upload a document to get a dyslexia-friendly version. Everything here
+          is private to you.
         </p>
       </div>
 
@@ -67,7 +68,7 @@ export default async function DashboardPage() {
               <li key={doc.id}>
                 <Link
                   href={`/document/${doc.id}`}
-                  className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-6 py-5 shadow-sm transition-colors hover:border-primary"
+                  className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-6 py-5 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary"
                 >
                   <span className="flex flex-col gap-1">
                     <span className="text-lg font-bold">{doc.title}</span>
