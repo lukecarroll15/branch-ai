@@ -1,6 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { processDocument } from "@/lib/process";
+
+// Give the post-response processing work (download + extract + Gemini) room to
+// run on Vercel before the function is frozen.
+export const maxDuration = 60;
 
 // Map browser MIME types to our `file_type` enum (pdf | image | docx).
 const TYPE_MAP: Record<string, "pdf" | "image" | "docx"> = {
@@ -70,9 +74,17 @@ export async function POST(request: Request) {
     );
   }
 
-  // Trigger processing. The stub is instant; once Gemini is wired this may
-  // take longer, at which point we'd move it to a background job.
-  await processDocument(doc.id);
+  // Process after the response is sent so the upload returns immediately. The
+  // row is already "processing", and the document page polls until it flips to
+  // "complete"/"error". processDocument records its own failure in the row, so
+  // here we only log for diagnostics.
+  after(async () => {
+    try {
+      await processDocument(doc.id);
+    } catch (err) {
+      console.error(`Processing failed for document ${doc.id}:`, err);
+    }
+  });
 
   return NextResponse.json({ documentId: doc.id });
 }

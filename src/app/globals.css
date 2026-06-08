@@ -120,12 +120,35 @@ html {
   animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Friendly "we're working on it" loader — three dots in the keyword-tile
+   colours bounce in turn. Playful for younger readers, but gentle (no flashing,
+   no spin). Pair each dot with an inline `animation-delay` to stagger them. */
+@keyframes bounce-dot {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  40% {
+    transform: translateY(-14px);
+    opacity: 1;
+  }
+}
+
+.animate-bounce-dot {
+  animation: bounce-dot 1.3s ease-in-out infinite;
+}
+
 /* Respect users who prefer less motion — no animation, no smooth scroll. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
   .animate-fade-up {
+    animation: none;
+  }
+  .animate-bounce-dot {
     animation: none;
   }
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import DocumentContent from "@/components/DocumentContent";
+import ProcessingState from "@/components/ProcessingState";
 import { createClient } from "@/lib/supabase/server";
 import type { DocumentRow } from "@/lib/types";
 
@@ -55,9 +56,7 @@ export default async function DocumentPage({
             again.
           </p>
         ) : (
-          <p className="mt-6 rounded-xl border border-tile-orange-border bg-tile-orange px-4 py-3 text-base">
-            We&apos;re still preparing your document. Refresh in a moment.
-          </p>
+          <ProcessingState />
         )}
       </div>
     </main>
