@@ -1,28 +1,6 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import type { DocumentRow } from "@/lib/types";
 import UploadButton from "@/components/UploadButton";
-
-// Small status pill shown on each document row.
-function StatusBadge({ status }: { status: DocumentRow["status"] }) {
-  const styles = {
-    processing: "bg-tile-orange border-tile-orange-border",
-    complete: "bg-accent border-primary-light",
-    error: "bg-tile-red border-tile-red-border",
-  }[status];
-
-  const label = {
-    processing: "Processing…",
-    complete: "Ready",
-    error: "Failed",
-  }[status];
-
-  return (
-    <span className={`rounded-full border px-3 py-1 text-sm font-bold ${styles}`}>
-      {label}
-    </span>
-  );
-}
+import DocumentRow from "@/components/DocumentRow";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -65,24 +43,7 @@ export default async function DashboardPage() {
         ) : (
           <ul className="flex flex-col gap-3">
             {docs.map((doc) => (
-              <li key={doc.id}>
-                <Link
-                  href={`/document/${doc.id}`}
-                  className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-6 py-5 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary"
-                >
-                  <span className="flex flex-col gap-1">
-                    <span className="text-lg font-bold">{doc.title}</span>
-                    <span className="text-sm text-muted">
-                      {new Date(doc.created_at).toLocaleDateString("en-IE", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </span>
-                  <StatusBadge status={doc.status} />
-                </Link>
-              </li>
+              <DocumentRow key={doc.id} doc={doc} />
             ))}
           </ul>
         )}

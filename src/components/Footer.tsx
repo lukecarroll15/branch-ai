@@ -116,16 +116,8 @@ export default function Footer() {
             <span className="text-sm text-muted">
               Made with care for dyslexic learners 🌱
             </span>
-
-            {/* Status pill */}
-            <span className="hidden items-center gap-2 rounded-full border border-border px-3 py-1 text-sm text-muted sm:inline-flex">
-              <span
-                className="h-2 w-2 rounded-full bg-primary-light"
-                aria-hidden="true"
-              />
-              All systems operational
-            </span>
           </div>
+          
         </div>
       </div>
     </footer>
