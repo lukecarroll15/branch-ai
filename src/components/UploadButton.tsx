@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 // Accepted file types for the picker (PDF, image, Word doc).
 const ACCEPT = ".pdf,.jpg,.jpeg,.png,.docx";
 
+// Reject oversized files before uploading. Keep in sync with the API route.
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 export default function UploadButton() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -15,6 +18,12 @@ export default function UploadButton() {
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (file.size > MAX_FILE_BYTES) {
+      setError("That file is too big. Please upload a file under 10 MB.");
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
 
     setUploading(true);
     setError(null);

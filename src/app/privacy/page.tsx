@@ -37,7 +37,7 @@ const sections: { heading: string; body: string }[] = [
   },
 ];
 
-const CONTACT_EMAIL = "hello@branch.study";
+const CONTACT_EMAIL = "info@learningwithbranch.com";
 
 export default function PrivacyPage() {
   return (

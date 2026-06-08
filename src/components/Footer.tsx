@@ -14,8 +14,7 @@ type FooterSection = { heading: string; links: FooterLink[] };
 // Every link points to something that actually exists — a landing-page
 // section, a real route, or an email. During the pilot we'd rather show a
 // short, honest footer than a tidy-looking one full of dead links.
-// TODO: update CONTACT_EMAIL to the real pilot contact address.
-const CONTACT_EMAIL = "hello@branch.study";
+const CONTACT_EMAIL = "info@learningwithbranch.com";
 
 const footerSections: FooterSection[] = [
   {

@@ -6,6 +6,10 @@ import { processDocument } from "@/lib/process";
 // run on Vercel before the function is frozen.
 export const maxDuration = 60;
 
+// Reject oversized uploads up front — keeps processing quick and well within
+// Gemini's limits. Keep this in sync with the check in UploadButton.
+const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+
 // Map browser MIME types to our `file_type` enum (pdf | image | docx).
 const TYPE_MAP: Record<string, "pdf" | "image" | "docx"> = {
   "application/pdf": "pdf",
@@ -30,6 +34,13 @@ export async function POST(request: Request) {
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
+  }
+
+  if (file.size > MAX_FILE_BYTES) {
+    return NextResponse.json(
+      { error: "That file is too big. Please upload a file under 10 MB." },
+      { status: 400 },
+    );
   }
 
   const fileType = TYPE_MAP[file.type];
