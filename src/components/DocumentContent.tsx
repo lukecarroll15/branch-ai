@@ -1,5 +1,7 @@
 import type { ProcessedDocument, Section, Segment } from "@/lib/types";
 import KeywordTile from "@/components/KeywordTile";
+import ReadAloud from "@/components/ReadAloud";
+import { SpeechProvider } from "@/components/SpeechContext";
 
 // Render one section's segments: plain text runs interleaved with keyword tiles.
 function renderSegments(segments: Segment[]) {
@@ -64,10 +66,21 @@ function renderSection(section: Section, i: number) {
   }
 }
 
-export default function DocumentContent({ doc }: { doc: ProcessedDocument }) {
+export default function DocumentContent({
+  doc,
+  preview = false,
+}: {
+  doc: ProcessedDocument;
+  // On the marketing preview we keep the layout clean (no control bar), but
+  // tiles stay tappable-to-hear so the sample is still a live demo.
+  preview?: boolean;
+}) {
   return (
-    <article className="flex flex-col gap-5">
-      {doc.sections.map((section, i) => renderSection(section, i))}
-    </article>
+    <SpeechProvider>
+      <article className="flex flex-col gap-5">
+        {!preview && <ReadAloud doc={doc} />}
+        {doc.sections.map((section, i) => renderSection(section, i))}
+      </article>
+    </SpeechProvider>
   );
 }

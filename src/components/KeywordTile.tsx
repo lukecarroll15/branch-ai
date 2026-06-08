@@ -1,4 +1,7 @@
+"use client";
+
 import type { TileColor } from "@/lib/types";
+import { useSpeech } from "@/components/SpeechContext";
 
 // Fill + border classes per priority tier. The colour utilities come from the
 // theme tokens in globals.css (bg-tile-*, border-tile-*-border).
@@ -15,28 +18,40 @@ interface KeywordTileProps {
   explanation?: string;
 }
 
-// An inline, colour-coded keyword. On hover or keyboard focus it reveals a
-// small card with the phonics breakdown and a simple explanation — the core
-// reading aid for dyslexic students. Tooltip is CSS-only (group-hover /
-// focus-within) so this stays a server component.
+// An inline, colour-coded keyword. On hover or keyboard focus it reveals a card
+// with the phonics breakdown and a simple explanation; tapping it reads the word
+// and its meaning aloud — the core reading aid for dyslexic students.
 export default function KeywordTile({
   text,
   color,
   phonics,
   explanation,
 }: KeywordTileProps) {
+  const { speak } = useSpeech();
   const hasAids = Boolean(phonics || explanation);
+
+  function handleSpeak() {
+    speak(explanation ? `${text}. ${explanation}` : text);
+  }
 
   return (
     <span className="group relative inline-block">
-      <span
-        tabIndex={hasAids ? 0 : undefined}
-        className={`rounded-md border px-1.5 py-0.5 font-bold outline-none ${TILE_STYLES[color]} ${
-          hasAids ? "cursor-help focus:ring-2 focus:ring-primary/40" : ""
-        }`}
-      >
-        {text}
-      </span>
+      {hasAids ? (
+        <button
+          type="button"
+          onClick={handleSpeak}
+          aria-label={`Hear "${text}"${explanation ? `: ${explanation}` : ""}`}
+          className={`cursor-pointer rounded-md border px-1.5 py-0.5 font-bold outline-none focus:ring-2 focus:ring-primary/40 ${TILE_STYLES[color]}`}
+        >
+          {text}
+        </button>
+      ) : (
+        <span
+          className={`rounded-md border px-1.5 py-0.5 font-bold ${TILE_STYLES[color]}`}
+        >
+          {text}
+        </span>
+      )}
 
       {hasAids && (
         <span
@@ -49,6 +64,7 @@ export default function KeywordTile({
           {explanation && (
             <span className="mt-1 block text-foreground">{explanation}</span>
           )}
+          <span className="mt-2 block text-sm text-muted">🔊 Tap to hear it</span>
         </span>
       )}
     </span>

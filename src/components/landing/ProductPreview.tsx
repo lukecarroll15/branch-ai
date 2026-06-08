@@ -46,7 +46,7 @@ export default function ProductPreview() {
             </p>
 
             <div className="mt-8">
-              <DocumentContent doc={sampleDocument} />
+              <DocumentContent doc={sampleDocument} preview />
             </div>
 
             {/* Legend */}

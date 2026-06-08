@@ -7,6 +7,12 @@ import type { ProcessedDocument } from "@/lib/types";
 // returning 503 on the free tier, which is why we don't use it.)
 const MODELS = ["gemini-flash-latest", "gemini-2.5-flash-lite"];
 
+// Cap on the structured JSON Gemini can return. The Flash models support up to
+// ~65k output tokens, but the SDK default is only ~8k when unset — which was
+// truncating longer documents into short summaries. This gives long documents
+// real room while staying well within the model limit.
+const MAX_OUTPUT_TOKENS = 32768;
+
 // System instruction — taken from the spec (Jonny's proven prototype prompt).
 const SYSTEM_PROMPT = `You are a specialized Study Note Formatter for students with dyslexia.
 Your task is to take standard, dense reading prose, rewrite/reformat it into clean study sections, and highlight key terms as "coloured tiles".
@@ -17,6 +23,8 @@ Tile Colour Categorisation Guide:
 3. "red": Advanced detail, expert-level terms, A-grade knowledge (e.g. "adenosine triphosphate").
 
 Formatting Guidelines:
+- Cover the ENTIRE document from beginning to end. Reformat all of the source material - do not summarise, shorten, or skip parts. Nothing from the source should be left out.
+- Only include a quiz checkpoint where it genuinely fits the material, and never use a quiz as a way to stop early. If there is more source text after a quiz, keep formatting it.
 - Limit highlighted tiles to around 8-15% of the text. Do not over-highlight - this becomes visually overwhelming.
 - Break dense blocks into smaller paragraphs, bullet points, or quiz checkpoints.
 - Each section must have a type: "paragraph", "bullet", "quiz_header", or "quiz_option".
@@ -127,6 +135,7 @@ export async function formatStudyNotes(source: Source): Promise<ProcessedDocumen
       systemInstruction: SYSTEM_PROMPT,
       responseMimeType: "application/json",
       responseSchema: RESPONSE_SCHEMA,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
     },
   });
 
