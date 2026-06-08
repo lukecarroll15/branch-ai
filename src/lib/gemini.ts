@@ -1,7 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import type { ProcessedDocument } from "@/lib/types";
 
-const MODEL = "gemini-2.5-flash";
+// Models to try, in order. "gemini-flash-latest" tracks the current stable
+// Flash model so it won't go stale; if it's ever overloaded we fall back to
+// the lite model. (The older pinned "gemini-2.5-flash" was chronically
+// returning 503 on the free tier, which is why we don't use it.)
+const MODELS = ["gemini-flash-latest", "gemini-2.5-flash-lite"];
 
 // System instruction — taken from the spec (Jonny's proven prototype prompt).
 const SYSTEM_PROMPT = `You are a specialized Study Note Formatter for students with dyslexia.
@@ -78,24 +82,39 @@ function buildContents(source: Source) {
 }
 
 // Gemini sometimes returns transient 429 (rate limit) / 503 (overloaded)
-// errors. Retry those a few times with exponential backoff before giving up.
-const MAX_RETRIES = 3;
+// errors. We retry those with exponential backoff, and if a model stays
+// overloaded after its retries we fall back to the next model in MODELS.
+const MAX_RETRIES = 2;
 const RETRYABLE_STATUS = new Set([429, 503]);
 
 async function generateWithRetry(
   ai: GoogleGenAI,
-  request: Parameters<GoogleGenAI["models"]["generateContent"]>[0],
+  request: Omit<
+    Parameters<GoogleGenAI["models"]["generateContent"]>[0],
+    "model"
+  >,
 ) {
-  for (let attempt = 0; ; attempt++) {
-    try {
-      return await ai.models.generateContent(request);
-    } catch (err) {
-      const status = (err as { status?: number })?.status ?? 0;
-      if (!RETRYABLE_STATUS.has(status) || attempt >= MAX_RETRIES) throw err;
-      // 1s, 2s, 4s
-      await new Promise((resolve) => setTimeout(resolve, 1000 * 2 ** attempt));
+  let lastErr: unknown;
+
+  for (const model of MODELS) {
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        return await ai.models.generateContent({ ...request, model });
+      } catch (err) {
+        lastErr = err;
+        const status = (err as { status?: number })?.status ?? 0;
+        // Not a transient error → no point retrying or failing over.
+        if (!RETRYABLE_STATUS.has(status)) throw err;
+        // More attempts left for this model → back off (1s, 2s) and retry.
+        if (attempt < MAX_RETRIES) {
+          await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+        }
+        // Otherwise the inner loop ends and we fall over to the next model.
+      }
     }
   }
+
+  throw lastErr;
 }
 
 // Send source material to Gemini and return the structured document.
@@ -103,7 +122,6 @@ export async function formatStudyNotes(source: Source): Promise<ProcessedDocumen
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
   const response = await generateWithRetry(ai, {
-    model: MODEL,
     contents: buildContents(source),
     config: {
       systemInstruction: SYSTEM_PROMPT,
