@@ -35,11 +35,7 @@ export default async function DocumentPage({
         ← Back to your documents
       </Link>
 
-      <div
-        className={`animate-fade-up mt-8 rounded-3xl border border-border p-8 shadow-soft sm:p-12 ${
-          isReady ? "bg-[var(--reading-bg)]" : "bg-surface"
-        }`}
-      >
+      <div className="animate-fade-up mt-8 rounded-3xl border border-border bg-surface p-8 shadow-soft sm:p-12">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
           {doc.title}
         </h1>
@@ -51,7 +47,7 @@ export default async function DocumentPage({
               what it means.
             </p>
             <div className="mt-8">
-              <DocumentContent doc={doc.processed_content!} />
+              <DocumentContent doc={doc.processed_content!} documentId={doc.id} />
             </div>
           </>
         ) : doc.status === "error" ? (

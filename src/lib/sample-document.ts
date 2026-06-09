@@ -7,6 +7,19 @@ export const sampleDocument: ProcessedDocument = {
   title: "Photosynthesis",
   sections: [
     {
+      sectionType: "heading",
+      segments: [{ text: "What photosynthesis is", isTile: false }],
+    },
+    {
+      sectionType: "key_point",
+      segments: [
+        {
+          text: "Plants turn sunlight into food they can store for later.",
+          isTile: false,
+        },
+      ],
+    },
+    {
       sectionType: "paragraph",
       segments: [
         { text: "", isTile: false },
@@ -49,6 +62,19 @@ export const sampleDocument: ProcessedDocument = {
         },
         {
           text: ", which contain a green pigment that captures sunlight.",
+          isTile: false,
+        },
+      ],
+    },
+    {
+      sectionType: "heading",
+      segments: [{ text: "What goes in and out", isTile: false }],
+    },
+    {
+      sectionType: "key_point",
+      segments: [
+        {
+          text: "Plants take in carbon dioxide and water, and give off oxygen.",
           isTile: false,
         },
       ],
@@ -97,6 +123,19 @@ export const sampleDocument: ProcessedDocument = {
       ],
     },
     {
+      sectionType: "heading",
+      segments: [{ text: "The steps in order", isTile: false }],
+    },
+    {
+      sectionType: "key_point",
+      segments: [
+        {
+          text: "Capture light, split water, then make sugar — and check what you remember.",
+          isTile: false,
+        },
+      ],
+    },
+    {
       sectionType: "paragraph",
       segments: [
         { text: "The steps happen in order: ", isTile: false },
@@ -115,18 +154,23 @@ export const sampleDocument: ProcessedDocument = {
       segments: [
         { text: "Quick check: where does photosynthesis happen?", isTile: false },
       ],
+      explanation:
+        "Photosynthesis takes place in the chloroplasts, which hold the green pigment that captures sunlight.",
     },
     {
       sectionType: "quiz_option",
       segments: [{ text: "A) In the roots", isTile: false }],
+      isCorrect: false,
     },
     {
       sectionType: "quiz_option",
       segments: [{ text: "B) In the chloroplasts", isTile: false }],
+      isCorrect: true,
     },
     {
       sectionType: "quiz_option",
       segments: [{ text: "C) In the soil", isTile: false }],
+      isCorrect: false,
     },
   ],
 };

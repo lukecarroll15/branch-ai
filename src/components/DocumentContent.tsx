@@ -3,7 +3,13 @@ import KeywordTile from "@/components/KeywordTile";
 import ReadAloud from "@/components/ReadAloud";
 import ReadingSettings from "@/components/ReadingSettings";
 import QuizBlock from "@/components/QuizBlock";
+import StudyCard from "@/components/StudyCard";
+import SimplifyParagraph from "@/components/SimplifyParagraph";
 import { SpeechProvider } from "@/components/SpeechContext";
+
+// Paragraphs shorter than this don't get a "Simplify this" control — they're
+// already easy to read, and a button on every line would add clutter.
+const SIMPLIFY_MIN_CHARS = 120;
 
 // Strip a leading bullet/marker character ("• ", "- ", "* ") from a bullet's
 // text — some processed content includes one, which doubled up with the CSS
@@ -35,7 +41,8 @@ function renderSegments(segments: Segment[]) {
 }
 
 // Render a single non-quiz section (quiz sections are grouped into QuizBlock).
-function renderSection(section: Section, i: number) {
+// `simplify` enables the per-paragraph "Simplify this" control (off in preview).
+function renderSection(section: Section, i: number, simplify: boolean) {
   if (section.sectionType === "bullet") {
     return (
       <div key={i} className="flex gap-3">
@@ -47,9 +54,18 @@ function renderSection(section: Section, i: number) {
     );
   }
 
-  return (
-    <p key={i}>{renderSegments(section.segments)}</p>
-  );
+  const content = renderSegments(section.segments);
+  const text = section.segments.map((s) => s.text).join("");
+
+  if (simplify && text.trim().length > SIMPLIFY_MIN_CHARS) {
+    return (
+      <SimplifyParagraph key={i} text={text}>
+        {content}
+      </SimplifyParagraph>
+    );
+  }
+
+  return <p key={i}>{content}</p>;
 }
 
 // Group the flat section list into render blocks, folding a quiz_header and its
@@ -86,22 +102,121 @@ function buildBlocks(sections: Section[]): Block[] {
   return blocks;
 }
 
-function renderBlocks(doc: ProcessedDocument) {
-  return buildBlocks(doc.sections).map((block, i) => {
-    if (block.kind === "quiz") {
+// Flatten a section's segments to plain text. Used for heading/key_point,
+// which are plain text only (no tiles).
+function plainText(section: Section): string {
+  return section.segments.map((s) => s.text).join("");
+}
+
+// Render one block (a section or a folded quiz) from a card body. The shared
+// `counter` keeps quiz questionIndex stable and unique across the whole
+// document so quiz feedback stays correctly attributed.
+function renderBodyBlock(
+  block: Block,
+  key: number,
+  counter: { n: number },
+  simplify: boolean,
+  documentId?: string,
+) {
+  if (block.kind === "quiz") {
+    const questionIndex = counter.n++;
+    const correctIndex = block.options.findIndex((o) => o.isCorrect === true);
+    return (
+      <QuizBlock
+        key={key}
+        header={block.header ? renderSegments(block.header.segments) : null}
+        // Options are plain answer text — flattened so we never nest a tile
+        // <button> inside the option <button>.
+        options={block.options.map((o) =>
+          o.segments.map((s) => s.text).join(""),
+        )}
+        correctIndex={correctIndex >= 0 ? correctIndex : null}
+        explanation={block.header?.explanation ?? null}
+        documentId={documentId}
+        questionIndex={questionIndex}
+      />
+    );
+  }
+  return renderSection(block.section, key, simplify);
+}
+
+// A topic card: a heading + its one-line key point + the full detail under it.
+type Card = {
+  heading: Section | null;
+  keyPoint: Section | null;
+  body: Block[];
+};
+
+// Group the block stream into topic cards. A "heading" block opens a new card;
+// the "key_point" right after it becomes that card's summary; everything else
+// is the card's body. Content before the first heading (or any stray block)
+// falls into a headless card that renders without a collapse toggle.
+function buildCards(blocks: Block[]): Card[] {
+  const cards: Card[] = [];
+  let current: Card | null = null;
+
+  for (const block of blocks) {
+    if (block.kind === "section" && block.section.sectionType === "heading") {
+      current = { heading: block.section, keyPoint: null, body: [] };
+      cards.push(current);
+      continue;
+    }
+    if (block.kind === "section" && block.section.sectionType === "key_point") {
+      if (current && current.heading && !current.keyPoint) {
+        current.keyPoint = block.section;
+        continue;
+      }
+      current = { heading: null, keyPoint: block.section, body: [] };
+      cards.push(current);
+      continue;
+    }
+    if (!current) {
+      current = { heading: null, keyPoint: null, body: [] };
+      cards.push(current);
+    }
+    current.body.push(block);
+  }
+
+  return cards;
+}
+
+function renderCards(
+  doc: ProcessedDocument,
+  simplify: boolean,
+  defaultOpen: boolean,
+  documentId?: string,
+) {
+  const cards = buildCards(buildBlocks(doc.sections));
+  const counter = { n: 0 };
+
+  return cards.map((card, i) => {
+    const body = card.body.map((block, j) =>
+      renderBodyBlock(block, j, counter, simplify, documentId),
+    );
+
+    // Headless card (intro text before the first heading): no card chrome,
+    // just render the content so nothing is hidden behind a toggle.
+    if (!card.heading) {
       return (
-        <QuizBlock
-          key={i}
-          header={block.header ? renderSegments(block.header.segments) : null}
-          // Options are plain answer text — flattened so we never nest a tile
-          // <button> inside the option <button>.
-          options={block.options.map((o) =>
-            o.segments.map((s) => s.text).join(""),
+        <div key={i} className="flex flex-col gap-6">
+          {card.keyPoint && (
+            <p className="text-base text-muted">{plainText(card.keyPoint)}</p>
           )}
-        />
+          {body}
+        </div>
       );
     }
-    return renderSection(block.section, i);
+
+    return (
+      <StudyCard
+        key={i}
+        heading={plainText(card.heading)}
+        keyPoint={card.keyPoint ? plainText(card.keyPoint) : null}
+        defaultOpen={defaultOpen}
+      >
+        {body}
+      </StudyCard>
+    );
   });
 }
 
@@ -117,9 +232,12 @@ const readingStyle: React.CSSProperties = {
 
 export default function DocumentContent({
   doc,
+  documentId,
   preview = false,
 }: {
   doc: ProcessedDocument;
+  // The documents table row id — used to log quiz feedback. Absent in preview.
+  documentId?: string;
   // On the marketing preview we keep the layout clean (no toolbar), but tiles
   // stay tappable-to-hear so the sample is still a live demo.
   preview?: boolean;
@@ -127,7 +245,11 @@ export default function DocumentContent({
   if (preview) {
     return (
       <SpeechProvider>
-        <article className="flex flex-col gap-7">{renderBlocks(doc)}</article>
+        <article className="flex flex-col gap-5">
+          {/* Preview cards open by default so the marketing sample shows real
+              content at a glance. */}
+          {renderCards(doc, false, true)}
+        </article>
       </SpeechProvider>
     );
   }
@@ -139,8 +261,10 @@ export default function DocumentContent({
           <ReadingSettings />
           <ReadAloud doc={doc} />
         </div>
-        <article style={readingStyle} className="flex flex-col gap-7">
-          {renderBlocks(doc)}
+        <article style={readingStyle} className="flex flex-col gap-5">
+          {/* Study view: cards collapsed by default — only headings + key
+              points show until the student opens a topic. */}
+          {renderCards(doc, true, false, documentId)}
         </article>
       </div>
     </SpeechProvider>

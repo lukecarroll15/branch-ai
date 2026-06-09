@@ -4,7 +4,16 @@
 
 export type TileColor = "lavender" | "orange" | "red" | "teal";
 
-export type SectionType = "paragraph" | "bullet" | "quiz_header" | "quiz_option";
+// "heading" starts a new topic (the card title); "key_point" is the one-line
+// takeaway shown under a heading while the card is collapsed. Together they give
+// the document a scannable spine so it reads as study cards, not a wall of prose.
+export type SectionType =
+  | "heading"
+  | "key_point"
+  | "paragraph"
+  | "bullet"
+  | "quiz_header"
+  | "quiz_option";
 
 // A segment is one run of text inside a section: either plain text, or a
 // highlighted keyword "tile" with extra reading aids (phonics + explanation).
@@ -19,6 +28,10 @@ export interface Segment {
 export interface Section {
   sectionType: SectionType;
   segments: Segment[];
+  // Quiz fields: on a "quiz_option", isCorrect marks the right answer; on a
+  // "quiz_header", explanation is a short plain reason the answer is correct.
+  isCorrect?: boolean;
+  explanation?: string;
 }
 
 export interface ProcessedDocument {

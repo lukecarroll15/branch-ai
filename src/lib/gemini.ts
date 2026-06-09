@@ -23,12 +23,22 @@ Tile Colour Categorisation Guide:
 3. "red": Advanced detail, expert-level terms, A-grade knowledge (e.g. "adenosine triphosphate").
 4. "teal": List sub-point labels and ordered markers (e.g. "A", "B", "C", "Step 1", "i", "ii"). Use this to make the structure of lists easy to scan.
 
+Structure the notes as a series of TOPICS. Dyslexic students are overwhelmed by walls of text, so the notes must be scannable: a student should understand the shape of the whole document by reading only the headings and key points, then open any topic for the full detail.
+
+For each topic, in this order:
+1. One "heading" section — a short, plain topic title (2-6 words). This is the card title.
+2. One "key_point" section — a single plain-English sentence capturing the topic's main takeaway. This is shown while the topic is collapsed, so it must stand alone.
+3. The full detail of that topic as "paragraph", "bullet", and (where it fits) quiz sections.
+
 Formatting Guidelines:
-- Cover the ENTIRE document from beginning to end. Reformat all of the source material - do not summarise, shorten, or skip parts. Nothing from the source should be left out.
+- Cover the ENTIRE document from beginning to end. Reformat all of the source material into topics - do not summarise, shorten, or skip the detail. Nothing from the source should be left out; the headings and key points are added ON TOP of the full content, never a replacement for it.
+- Group the material into a sensible number of topics (most documents are 3-8). Start every topic with its "heading" then its "key_point".
 - Only include a quiz checkpoint where it genuinely fits the material, and never use a quiz as a way to stop early. If there is more source text after a quiz, keep formatting it.
 - Limit highlighted tiles to around 8-15% of the text. Do not over-highlight - this becomes visually overwhelming.
 - Break dense blocks into smaller paragraphs, bullet points, or quiz checkpoints.
-- Each section must have a type: "paragraph", "bullet", "quiz_header", or "quiz_option".
+- Each section must have a type: "heading", "key_point", "paragraph", "bullet", "quiz_header", or "quiz_option".
+- "heading" and "key_point" sections contain plain text only — do not put highlighted tiles in them.
+- For quizzes: give a "quiz_header" (the question) followed by 3-4 "quiz_option" sections. Set "isCorrect": true on exactly ONE option (the right answer) and false on the rest. On the "quiz_header", set "explanation" to a short, plain-English reason the correct answer is right.
 - Inside each section, split the text into sequential segments. A segment is either a highlighted tile or a plain text run.
 - For every tile, include "phonics" (a syllable breakdown like "pho-to-syn-the-sis") and a short plain-English "explanation".
 - For plain text segments set "isTile" to false and omit color/phonics/explanation.`;
@@ -45,7 +55,14 @@ const RESPONSE_SCHEMA = {
         properties: {
           sectionType: {
             type: Type.STRING,
-            enum: ["paragraph", "bullet", "quiz_header", "quiz_option"],
+            enum: [
+              "heading",
+              "key_point",
+              "paragraph",
+              "bullet",
+              "quiz_header",
+              "quiz_option",
+            ],
           },
           segments: {
             type: Type.ARRAY,
@@ -65,9 +82,16 @@ const RESPONSE_SCHEMA = {
               propertyOrdering: ["text", "isTile", "color", "phonics", "explanation"],
             },
           },
+          isCorrect: { type: Type.BOOLEAN },
+          explanation: { type: Type.STRING },
         },
         required: ["sectionType", "segments"],
-        propertyOrdering: ["sectionType", "segments"],
+        propertyOrdering: [
+          "sectionType",
+          "segments",
+          "isCorrect",
+          "explanation",
+        ],
       },
     },
   },
@@ -127,6 +151,31 @@ async function generateWithRetry(
   }
 
   throw lastErr;
+}
+
+// On-demand "Simplify this" — rewrite a single passage in plainer language.
+// Returns plain text (no structure), so no response schema is needed.
+const SIMPLIFY_SYSTEM_PROMPT = `You rewrite text in plain, simple English for a student with dyslexia aged 12-18.
+Rules:
+- Keep the original meaning and all the key facts.
+- Use short sentences and common, everyday words.
+- Break long or complex sentences into shorter ones.
+- Do not add new information, opinions, or a preamble. Return only the rewritten text.`;
+
+export async function simplifyText(text: string): Promise<string> {
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
+  const response = await generateWithRetry(ai, {
+    contents: [{ text: `Rewrite this passage in plainer language:\n\n${text}` }],
+    config: {
+      systemInstruction: SIMPLIFY_SYSTEM_PROMPT,
+      maxOutputTokens: 2048,
+    },
+  });
+
+  const out = response.text;
+  if (!out) throw new Error("Gemini returned an empty response.");
+  return out.trim();
 }
 
 // Send source material to Gemini and return the structured document.

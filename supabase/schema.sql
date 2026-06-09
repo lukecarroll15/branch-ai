@@ -134,3 +134,36 @@ create policy "Storage: delete own files"
     bucket_id = 'documents'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+
+-- ------------------------------------------------------------
+-- 5. quiz feedback
+--    One row per (student, document, question): was it easy or hard?
+--    This is the seed data for spaced-repetition scheduling later.
+-- ------------------------------------------------------------
+create table if not exists public.quiz_feedback (
+  id             uuid        primary key default gen_random_uuid(),
+  user_id        uuid        not null references public.profiles (id) on delete cascade,
+  document_id    uuid        not null references public.documents (id) on delete cascade,
+  question_index int         not null,
+  rating         text        not null check (rating in ('easy', 'hard')),
+  created_at     timestamptz not null default now(),
+  unique (user_id, document_id, question_index)
+);
+
+alter table public.quiz_feedback enable row level security;
+
+drop policy if exists "Quiz feedback: select own" on public.quiz_feedback;
+create policy "Quiz feedback: select own"
+  on public.quiz_feedback for select
+  using (auth.uid() = user_id);
+
+drop policy if exists "Quiz feedback: insert own" on public.quiz_feedback;
+create policy "Quiz feedback: insert own"
+  on public.quiz_feedback for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Quiz feedback: update own" on public.quiz_feedback;
+create policy "Quiz feedback: update own"
+  on public.quiz_feedback for update
+  using (auth.uid() = user_id);
