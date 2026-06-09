@@ -27,6 +27,8 @@
   --tile-orange-border: #f5d1c4;
   --tile-red: #fee2e2;            /* advanced / expert detail (A grade) */
   --tile-red-border: #fca5a5;
+  --tile-teal: #ccf2ef;           /* list sub-points / labels (A, B, C) */
+  --tile-teal-border: #8fdfd8;
 
   /* Reading comfort — generous spacing for dyslexia.
      These are the DEFAULTS; a per-student settings panel will
@@ -34,6 +36,16 @@
   --line-height: 1.8;
   --letter-spacing: 2px;
   --word-spacing: 0.15em;
+
+  /* Reading surface — the document view's paper. These are live-tuned by the
+     ReadingSettings bar (background, font, size, spacing) and read back by the
+     document page + DocumentContent. Defaults: cream paper, Lexend, roomy. */
+  --reading-bg: #f5f5dc;
+  --reading-font: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
+  --reading-size: 18px;
+  --reading-line: 1.95;
+  --reading-letter: 2px;
+  --reading-word: 0.16em;
 }
 
 /* Expose the theme to Tailwind as utility classes
@@ -58,6 +70,8 @@
   --color-tile-orange-border: var(--tile-orange-border);
   --color-tile-red: var(--tile-red);
   --color-tile-red-border: var(--tile-red-border);
+  --color-tile-teal: var(--tile-teal);
+  --color-tile-teal-border: var(--tile-teal-border);
 
   --font-sans: var(--font-lexend), ui-sans-serif, system-ui, sans-serif;
 }

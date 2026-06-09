@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { Lexend } from "next/font/google";
+import { Lexend, Atkinson_Hyperlegible } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-// Lexend — the dyslexia-friendly default per the spec. To swap fonts later,
-// change this import and the --font-lexend variable reference in globals.css.
-// (A per-student font switcher comes in a later phase.)
+// Lexend — the dyslexia-friendly default per the spec.
 const lexend = Lexend({
   variable: "--font-lexend",
   subsets: ["latin"],
+});
+
+// Atkinson Hyperlegible — an alternative legibility font students can pick from
+// the reading settings bar (exposed via the --font-atkinson variable).
+const atkinson = Atkinson_Hyperlegible({
+  variable: "--font-atkinson",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -27,7 +33,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${lexend.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${lexend.variable} ${atkinson.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col">
         <Header />
         {children}

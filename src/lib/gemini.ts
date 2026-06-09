@@ -21,6 +21,7 @@ Tile Colour Categorisation Guide:
 1. "lavender": Major primary key concepts, core vocabulary, primary terms (e.g. "photosynthesis", "mitochondria").
 2. "orange": Secondary important concepts, verbs, actions, main ideas (e.g. "primary purpose", "convert").
 3. "red": Advanced detail, expert-level terms, A-grade knowledge (e.g. "adenosine triphosphate").
+4. "teal": List sub-point labels and ordered markers (e.g. "A", "B", "C", "Step 1", "i", "ii"). Use this to make the structure of lists easy to scan.
 
 Formatting Guidelines:
 - Cover the ENTIRE document from beginning to end. Reformat all of the source material - do not summarise, shorten, or skip parts. Nothing from the source should be left out.
@@ -53,7 +54,10 @@ const RESPONSE_SCHEMA = {
               properties: {
                 text: { type: Type.STRING },
                 isTile: { type: Type.BOOLEAN },
-                color: { type: Type.STRING, enum: ["lavender", "orange", "red"] },
+                color: {
+                  type: Type.STRING,
+                  enum: ["lavender", "orange", "red", "teal"],
+                },
                 phonics: { type: Type.STRING },
                 explanation: { type: Type.STRING },
               },

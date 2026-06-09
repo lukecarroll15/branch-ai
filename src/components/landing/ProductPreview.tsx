@@ -10,11 +10,12 @@ import { sampleDocument } from "@/lib/sample-document";
 // drift from the real thing.
 // ============================================================
 
-// Small legend explaining the three tile tiers.
+// Small legend explaining the tile tiers.
 const LEGEND: { label: string; className: string }[] = [
   { label: "Core concept", className: "bg-tile-lavender border-tile-lavender-border" },
   { label: "Supporting idea", className: "bg-tile-orange border-tile-orange-border" },
   { label: "Advanced detail", className: "bg-tile-red border-tile-red-border" },
+  { label: "List sub-point", className: "bg-tile-teal border-tile-teal-border" },
 ];
 
 export default function ProductPreview() {

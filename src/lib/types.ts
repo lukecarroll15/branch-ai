@@ -2,7 +2,7 @@
 // processing prompt returns (see docs/branch-ai.md), so the same types are
 // reused when we wire up real processing later.
 
-export type TileColor = "lavender" | "orange" | "red";
+export type TileColor = "lavender" | "orange" | "red" | "teal";
 
 export type SectionType = "paragraph" | "bullet" | "quiz_header" | "quiz_option";
 

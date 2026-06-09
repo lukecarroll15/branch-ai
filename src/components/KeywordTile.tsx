@@ -9,6 +9,7 @@ const TILE_STYLES: Record<TileColor, string> = {
   lavender: "bg-tile-lavender border-tile-lavender-border",
   orange: "bg-tile-orange border-tile-orange-border",
   red: "bg-tile-red border-tile-red-border",
+  teal: "bg-tile-teal border-tile-teal-border",
 };
 
 interface KeywordTileProps {

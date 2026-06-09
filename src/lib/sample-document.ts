@@ -97,6 +97,20 @@ export const sampleDocument: ProcessedDocument = {
       ],
     },
     {
+      sectionType: "paragraph",
+      segments: [
+        { text: "The steps happen in order: ", isTile: false },
+        {
+          text: "A",
+          isTile: true,
+          color: "teal",
+          phonics: "ay",
+          explanation: "A sub-point label — the first step in a list.",
+        },
+        { text: ") capture light, B) split water, C) make sugar.", isTile: false },
+      ],
+    },
+    {
       sectionType: "quiz_header",
       segments: [
         { text: "Quick check: where does photosynthesis happen?", isTile: false },
