@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 // ============================================================
 // FOOTER — multi-column enterprise footer.
@@ -54,11 +55,14 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-5">
           {/* Brand + mission */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground shadow-sm">
-                B
-              </span>
-              <span className="text-xl font-bold tracking-tight">Branch</span>
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.svg"
+                alt="Branch"
+                width={720}
+                height={400}
+                className="h-10 w-auto"
+              />
             </Link>
 
             <p className="mt-5 max-w-xs text-base leading-relaxed text-muted">

@@ -8,16 +8,27 @@
    (but not harsh black) text, calm accent.
    ============================================================ */
 :root {
-  --background: #fdfbf7;          /* page background — creamy off-white, reduces glare */
+  --background: #fbf8ee;          /* page background — warm cream, reduces glare */
+  --background-2: #f5f0e0;        /* slightly deeper cream — alternating bands */
   --surface: #ffffff;             /* cards / raised areas */
-  --foreground: #333333;          /* main text — dark grey, never harsh black */
-  --muted: #6b6b6b;               /* secondary / helper text */
-  --accent: #eaf0e7;              /* soft green accent background */
-  --primary: #114227;             /* buttons, links, accents — dark green */
+  --foreground: #2a2822;          /* main text — soft near-black, never harsh */
+  --muted: #716e61;               /* secondary / helper text */
+  --accent: #e7efe7;              /* soft green accent background */
+  --primary: #1f5a3a;             /* buttons, links, accents — brand green */
+  --primary-deep: #133a26;        /* deep green — headings, dark panels */
   --primary-mid: #4a5d4c;         /* mid green — secondary accents */
   --primary-light: #7a9e7e;       /* light green — subtle highlights */
   --primary-foreground: #ffffff;  /* text shown on top of --primary */
   --border: #e6e2d3;              /* borders / dividers */
+
+  /* Warm accent palette — gold + clay highlights used across the
+     landing page (eyebrows, key terms, the final call-to-action).
+     Each has a strong tone and a soft fill. */
+  --gold: #c9971d;                /* gold accent — kickers, CTA button */
+  --gold-ink: #9a7415;            /* darker gold — readable gold text */
+  --gold-soft: #f4e6be;           /* soft gold fill */
+  --clay: #b06a3d;                /* clay accent — advanced/expert terms */
+  --clay-soft: #f2e1d4;           /* soft clay fill */
 
   /* Keyword tile colours — 3 priority tiers.
      Each tile has a soft fill and a slightly stronger border. */
@@ -53,15 +64,24 @@
    You normally won't need to touch this — just edit the values above. */
 @theme inline {
   --color-background: var(--background);
+  --color-background-2: var(--background-2);
   --color-surface: var(--surface);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-primary: var(--primary);
+  --color-primary-deep: var(--primary-deep);
   --color-primary-mid: var(--primary-mid);
   --color-primary-light: var(--primary-light);
   --color-primary-foreground: var(--primary-foreground);
   --color-border: var(--border);
+
+  /* Warm accents as Tailwind utilities (bg-gold, text-clay, etc.) */
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-gold-soft: var(--gold-soft);
+  --color-clay: var(--clay);
+  --color-clay-soft: var(--clay-soft);
 
   /* Tile fills + borders as Tailwind utilities (bg-tile-lavender, etc.) */
   --color-tile-lavender: var(--tile-lavender);

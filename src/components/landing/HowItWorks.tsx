@@ -2,6 +2,7 @@
 // HOW IT WORKS — three calm, concrete steps.
 // Data-driven so a step can be added or reworded in one place.
 // Icons are inline SVGs (no icon dependency) and inherit colour.
+// Sits on a soft banded background to separate it from the hero.
 // ============================================================
 
 type Step = {
@@ -18,7 +19,7 @@ const steps: Step[] = [
       <path
         d="M12 16V4m0 0L8 8m4-4l4 4M5 16v2a2 2 0 002 2h10a2 2 0 002-2v-2"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -31,7 +32,7 @@ const steps: Step[] = [
       <path
         d="M4 6h16M4 12h10M4 18h7M17 15l2 2 4-4"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -44,7 +45,7 @@ const steps: Step[] = [
       <path
         d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z M12 15a3 3 0 100-6 3 3 0 000 6z"
         stroke="currentColor"
-        strokeWidth="2"
+        strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -54,40 +55,50 @@ const steps: Step[] = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="mx-auto w-full max-w-5xl px-6 py-20">
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-bold uppercase tracking-wide text-primary-mid">
-          How it works
-        </p>
-        <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-          From overwhelming to understandable in three steps
-        </h2>
-      </div>
+    <section
+      id="how-it-works"
+      className="border-y border-border bg-background-2"
+    >
+      <div className="mx-auto w-full max-w-6xl px-6 py-20 sm:py-24">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-sm font-bold uppercase tracking-[0.12em] text-gold">
+            How it works
+          </p>
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-primary-deep sm:text-4xl">
+            From overwhelming to understandable in three steps
+          </h2>
+          <p className="mt-4 text-lg leading-relaxed text-muted">
+            No retyping, no clutter. Branch does the reformatting so students
+            can focus on reading.
+          </p>
+        </div>
 
-      <ol className="mt-14 grid gap-6 md:grid-cols-3">
-        {steps.map((step, i) => (
-          <li
-            key={step.title}
-            className="animate-fade-up flex flex-col rounded-3xl border border-border bg-surface p-8 shadow-soft"
-            style={{ animationDelay: `${i * 90}ms` }}
-          >
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-primary">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-6 w-6">
+        <ol className="mt-14 grid gap-7 md:grid-cols-3">
+          {steps.map((step, i) => (
+            <li
+              key={step.title}
+              className="animate-fade-up group relative flex flex-col rounded-3xl border border-border bg-surface p-8 shadow-soft transition-transform hover:-translate-y-1 hover:shadow-soft-lg"
+              style={{ animationDelay: `${i * 90}ms` }}
+            >
+              {/* corner icon */}
+              <span className="absolute right-7 top-7 text-gold" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
                   {step.icon}
                 </svg>
               </span>
-              <span className="text-sm font-bold text-muted">
-                Step {i + 1}
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent text-lg font-bold text-primary">
+                {i + 1}
               </span>
-            </div>
-            <h3 className="mt-6 text-xl font-bold">{step.title}</h3>
-            <p className="mt-3 text-base leading-relaxed text-muted">
-              {step.body}
-            </p>
-          </li>
-        ))}
-      </ol>
+              <h3 className="mt-6 text-xl font-bold text-primary-deep">
+                {step.title}
+              </h3>
+              <p className="mt-3 text-base leading-relaxed text-muted">
+                {step.body}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }

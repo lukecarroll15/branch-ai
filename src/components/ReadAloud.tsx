@@ -27,8 +27,7 @@ function collectChunks(doc: ProcessedDocument): string[] {
 }
 
 export default function ReadAloud({ doc }: { doc: ProcessedDocument }) {
-  const { supported, voices, voiceURI, setVoiceURI, makeUtterance } =
-    useSpeech();
+  const { supported, makeUtterance } = useSpeech();
   const [status, setStatus] = useState<Status>("idle");
   // Tracks the utterances we queued so we can ignore stray events after a stop.
   const sessionRef = useRef(0);
@@ -112,24 +111,6 @@ export default function ReadAloud({ doc }: { doc: ProcessedDocument }) {
             ⏹ Stop
           </button>
         </>
-      )}
-
-      {voices.length > 1 && (
-        <label className="ml-auto flex items-center gap-2 text-sm text-muted">
-          <span className="sr-only sm:not-sr-only">Voice</span>
-          <select
-            value={voiceURI ?? ""}
-            onChange={(e) => setVoiceURI(e.target.value)}
-            aria-label="Choose a reading voice"
-            className="max-w-[12rem] rounded-xl border border-border bg-surface px-3 py-2 text-base text-foreground"
-          >
-            {voices.map((v) => (
-              <option key={v.voiceURI} value={v.voiceURI}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-        </label>
       )}
     </div>
   );
