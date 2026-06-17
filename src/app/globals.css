@@ -41,12 +41,15 @@
   --tile-teal: #ccf2ef;           /* list sub-points / labels (A, B, C) */
   --tile-teal-border: #8fdfd8;
 
-  /* Reading comfort — generous spacing for dyslexia.
-     These are the DEFAULTS; a per-student settings panel will
-     override them later. */
-  --line-height: 1.8;
-  --letter-spacing: 2px;
-  --word-spacing: 0.15em;
+  /* Interface typography — matches the brand/marketing design:
+     calm, near-normal spacing with a 1.6 line-height. This is the
+     UI default (nav, landing, dashboard, forms). The actual study
+     reading surface keeps its own generous, dyslexia-comfort
+     spacing via the --reading-* tokens below, so insulating the
+     reading experience from this. */
+  --line-height: 1.6;
+  --letter-spacing: 0.005em;
+  --word-spacing: normal;
 
   /* Reading surface — the document view's paper. These are live-tuned by the
      ReadingSettings bar (background, font, size, spacing) and read back by the
