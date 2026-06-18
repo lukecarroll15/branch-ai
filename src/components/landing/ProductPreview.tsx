@@ -262,19 +262,31 @@ function Term({
 }
 
 // One face of the flip card: a full miniature note for a subject.
+//
+// All faces share a single CSS grid cell ([grid-area:1/1]) so the card
+// auto-sizes to the tallest note — no fixed height to overflow. `ghost`
+// faces are an invisible copy of every note used purely to reserve that
+// height; the two real faces (front/back) overlay them and do the flipping.
 function NoteFace({
   note,
-  rotation,
+  rotation = 0,
+  ghost = false,
   termProps,
 }: {
   note: Note;
-  rotation: number; // 0 for the front face, 180 for the back
+  rotation?: number; // 0 for the front face, 180 for the back
+  ghost?: boolean;
   termProps: (data: TermData) => React.ComponentProps<typeof Term>;
 }) {
   return (
     <div
-      className="absolute inset-0 px-7 py-7 [backface-visibility:hidden] sm:px-8"
-      style={{ transform: `rotateY(${rotation}deg)` }}
+      aria-hidden={ghost || undefined}
+      className={`px-7 py-7 [grid-area:1/1] sm:px-8 ${
+        ghost
+          ? "invisible pointer-events-none"
+          : "[backface-visibility:hidden]"
+      }`}
+      style={ghost ? undefined : { transform: `rotateY(${rotation}deg)` }}
     >
       <h2 className="text-2xl font-bold tracking-tight text-primary-deep">
         {note.title}
@@ -403,13 +415,10 @@ export default function ProductPreview() {
         </span>
       </div>
 
-      {/* Flip viewport — fixed height so both faces share the same space. */}
-      <div
-        className="relative min-h-[19rem] sm:min-h-[18rem]"
-        style={{ perspective: "1400px" }}
-      >
+      {/* Flip viewport — auto-sizes to the tallest note (no fixed height). */}
+      <div className="relative" style={{ perspective: "1400px" }}>
         <div
-          className="relative h-full w-full [transform-style:preserve-3d]"
+          className="grid [transform-style:preserve-3d]"
           style={{
             transform: `rotateY(${rotation}deg)`,
             transition: reduced
@@ -417,16 +426,13 @@ export default function ProductPreview() {
               : "transform 0.85s cubic-bezier(0.4, 0.1, 0.2, 1)",
           }}
         >
-          <NoteFace
-            note={NOTES[frontNote]}
-            rotation={0}
-            termProps={termProps}
-          />
-          <NoteFace
-            note={NOTES[backNote]}
-            rotation={180}
-            termProps={termProps}
-          />
+          {/* Invisible sizers — reserve height for the tallest subject. */}
+          {NOTES.map((note) => (
+            <NoteFace key={note.subject} note={note} ghost termProps={termProps} />
+          ))}
+
+          <NoteFace note={NOTES[frontNote]} rotation={0} termProps={termProps} />
+          <NoteFace note={NOTES[backNote]} rotation={180} termProps={termProps} />
         </div>
       </div>
 
