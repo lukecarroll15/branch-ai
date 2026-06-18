@@ -62,7 +62,7 @@ export default function SimplifyParagraph({
         ) : (
           <button
             type="button"
-            onClick={() => setShowing("original")}
+            onClick={() => { setShowing("original"); setError(null); }}
             className="inline-flex min-h-11 items-center gap-1 self-start text-sm font-bold text-muted transition-colors hover:text-foreground"
           >
             ↩ Show original

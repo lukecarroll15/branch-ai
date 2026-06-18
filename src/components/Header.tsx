@@ -45,7 +45,7 @@ export default async function Header() {
           />
         </Link>
 
-        {/* Centre menu — visitors only */}
+        {/* Centre menu — visitors only, desktop */}
         {!user && (
           <nav className="hidden items-center gap-8 md:flex">
             {MENU.map((item) => (
@@ -87,6 +87,24 @@ export default async function Header() {
           </div>
         )}
       </div>
+
+      {/* Mobile-only section links for logged-out visitors */}
+      {!user && (
+        <nav
+          aria-label="Site sections"
+          className="flex items-center gap-5 overflow-x-auto border-t border-border px-6 py-2 md:hidden"
+        >
+          {MENU.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="shrink-0 text-sm text-muted transition-colors hover:text-primary"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
     </header>
   );
 }

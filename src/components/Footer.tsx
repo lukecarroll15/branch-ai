@@ -9,7 +9,7 @@ import Image from "next/image";
 // border-border, primary greens) so it stays on-brand.
 // ============================================================
 
-type FooterLink = { label: string; href: string };
+type FooterLink = { label: string; href: string; external?: boolean };
 type FooterSection = { heading: string; links: FooterLink[] };
 
 // Every link points to something that actually exists — a landing-page
@@ -31,7 +31,7 @@ const footerSections: FooterSection[] = [
     links: [
       { label: "Why Branch", href: "/#trust" },
       { label: "Privacy & data", href: "/privacy" },
-      { label: "Contact us", href: `mailto:${CONTACT_EMAIL}` },
+      { label: "Contact us", href: `mailto:${CONTACT_EMAIL}`, external: true },
     ],
   },
   {
@@ -93,12 +93,21 @@ export default function Footer() {
                 <ul className="mt-4 flex flex-col gap-3">
                   {section.links.map((link) => (
                     <li key={link.label}>
-                      <Link
-                        href={link.href}
-                        className="text-base text-muted transition-colors hover:text-primary"
-                      >
-                        {link.label}
-                      </Link>
+                      {link.external ? (
+                        <a
+                          href={link.href}
+                          className="text-base text-muted transition-colors hover:text-primary"
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className="text-base text-muted transition-colors hover:text-primary"
+                        >
+                          {link.label}
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
