@@ -40,7 +40,7 @@ export default function Hero({ loggedIn }: { loggedIn: boolean }) {
         }}
       />
 
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-6 pb-12 pt-16 lg:grid-cols-[1fr_1.02fr] lg:gap-16 lg:pt-20">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 pb-10 pt-8 lg:grid-cols-[1fr_1.02fr] lg:gap-12 lg:pt-8">
         {/* ---- Left: copy ---- */}
         <div className="animate-fade-up">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-accent px-4 py-1.5 text-sm font-bold text-primary">
@@ -48,18 +48,18 @@ export default function Hero({ loggedIn }: { loggedIn: boolean }) {
             Designed with teachers, for dyslexic students
           </span>
 
-          <h1 className="mt-6 text-4xl font-bold leading-tight tracking-tight text-primary-deep sm:text-5xl lg:text-6xl">
+          <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-primary-deep sm:text-5xl lg:text-5xl">
             Study notes that make sense —{" "}
             <span className="text-primary">for the way you read.</span>
           </h1>
 
-          <p className="mt-6 max-w-md text-lg leading-relaxed text-muted">
+          <p className="mt-4 max-w-md text-lg leading-relaxed text-muted">
             Branch turns dense, intimidating documents into clean, colour-coded
             notes built for dyslexic learners. Less overwhelm, more
             understanding.
           </p>
 
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link
               href={loggedIn ? "/dashboard" : "/login"}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-4 text-lg font-bold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5 hover:opacity-95"
@@ -76,7 +76,7 @@ export default function Hero({ loggedIn }: { loggedIn: boolean }) {
           </div>
 
           {/* Trust row */}
-          <ul className="mt-10 flex flex-col gap-3 text-base text-muted sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
+          <ul className="mt-8 flex flex-col gap-3 text-base text-muted sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
             <li className="flex items-center gap-2">
               <Check /> Dyslexia-friendly by design
             </li>
