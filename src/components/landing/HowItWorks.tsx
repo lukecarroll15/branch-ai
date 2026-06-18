@@ -1,3 +1,5 @@
+import Reveal from "@/components/landing/Reveal";
+
 // ============================================================
 // HOW IT WORKS — three calm, concrete steps.
 // Data-driven so a step can be added or reworded in one place.
@@ -75,27 +77,25 @@ export default function HowItWorks() {
 
         <ol className="mt-14 grid gap-7 md:grid-cols-3">
           {steps.map((step, i) => (
-            <li
-              key={step.title}
-              className="animate-fade-up group relative flex flex-col rounded-3xl border border-border bg-surface p-8 shadow-soft transition-transform hover:-translate-y-1 hover:shadow-soft-lg"
-              style={{ animationDelay: `${i * 90}ms` }}
-            >
-              {/* corner icon */}
-              <span className="absolute right-7 top-7 text-gold" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
-                  {step.icon}
-                </svg>
-              </span>
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent text-lg font-bold text-primary">
-                {i + 1}
-              </span>
-              <h3 className="mt-6 text-xl font-bold text-primary-deep">
-                {step.title}
-              </h3>
-              <p className="mt-3 text-base leading-relaxed text-muted">
-                {step.body}
-              </p>
-            </li>
+            <Reveal as="li" key={step.title} delay={i * 110}>
+              <div className="group relative flex h-full flex-col rounded-3xl border border-border bg-surface p-8 shadow-soft transition-transform duration-300 ease-out hover:-translate-y-1 hover:shadow-soft-lg">
+                {/* corner icon */}
+                <span className="absolute right-7 top-7 text-gold" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
+                    {step.icon}
+                  </svg>
+                </span>
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-accent text-lg font-bold text-primary transition-transform duration-300 ease-out group-hover:-translate-y-0.5 group-hover:scale-105">
+                  {i + 1}
+                </span>
+                <h3 className="mt-6 text-xl font-bold text-primary-deep">
+                  {step.title}
+                </h3>
+                <p className="mt-3 text-base leading-relaxed text-muted">
+                  {step.body}
+                </p>
+              </div>
+            </Reveal>
           ))}
         </ol>
       </div>

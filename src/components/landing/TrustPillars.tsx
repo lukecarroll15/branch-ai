@@ -1,3 +1,5 @@
+import Reveal from "@/components/landing/Reveal";
+
 // ============================================================
 // TRUST PILLARS — the reasons a student, parent or teacher can
 // feel safe relying on Branch. This is the section that does the
@@ -85,25 +87,23 @@ export default function TrustPillars() {
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2">
           {pillars.map((pillar, i) => (
-            <div
-              key={pillar.title}
-              className="animate-fade-up flex gap-5 rounded-3xl border border-border bg-surface p-7 shadow-soft"
-              style={{ animationDelay: `${i * 80}ms` }}
-            >
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent text-primary">
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-6 w-6">
-                  {pillar.icon}
-                </svg>
-              </span>
-              <div>
-                <h3 className="text-xl font-bold text-primary-deep">
-                  {pillar.title}
-                </h3>
-                <p className="mt-2 text-base leading-relaxed text-muted">
-                  {pillar.body}
-                </p>
+            <Reveal key={pillar.title} delay={i * 90}>
+              <div className="group flex h-full gap-5 rounded-3xl border border-border bg-surface p-7 shadow-soft transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/20 hover:shadow-soft-lg">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent text-primary transition-transform duration-300 ease-out group-hover:scale-110">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-6 w-6">
+                    {pillar.icon}
+                  </svg>
+                </span>
+                <div>
+                  <h3 className="text-xl font-bold text-primary-deep">
+                    {pillar.title}
+                  </h3>
+                  <p className="mt-2 text-base leading-relaxed text-muted">
+                    {pillar.body}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

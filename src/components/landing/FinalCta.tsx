@@ -1,5 +1,6 @@
 import Link from "next/link";
 import BranchLogo from "@/components/BranchLogo";
+import Reveal from "@/components/landing/Reveal";
 
 // ============================================================
 // FINAL CTA — one last calm invitation. A deep-green panel with
@@ -10,7 +11,7 @@ import BranchLogo from "@/components/BranchLogo";
 export default function FinalCta({ loggedIn }: { loggedIn: boolean }) {
   return (
     <section className="mx-auto w-full max-w-6xl px-6 pb-24 pt-4">
-      <div className="animate-fade-up relative overflow-hidden rounded-[26px] bg-primary-deep px-8 py-16 text-center shadow-soft-lg sm:px-16 sm:py-20">
+      <Reveal className="relative block overflow-hidden rounded-[26px] bg-primary-deep px-8 py-16 text-center shadow-soft-lg sm:px-16 sm:py-20">
         {/* Faint tree watermark in the corner. */}
         <div
           aria-hidden="true"
@@ -36,7 +37,7 @@ export default function FinalCta({ loggedIn }: { loggedIn: boolean }) {
             <span aria-hidden="true">→</span>
           </Link>
         </div>
-      </div>
+      </Reveal>
     </section>
   );
 }
