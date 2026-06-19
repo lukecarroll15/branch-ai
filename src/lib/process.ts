@@ -3,6 +3,12 @@ import { extractPdfText, extractDocxText } from "@/lib/extract";
 import { formatStudyNotes } from "@/lib/gemini";
 import type { ProcessedDocument } from "@/lib/types";
 
+// Below this many characters we treat an extraction as "no real text". A
+// scanned or photographed PDF has no embedded text, so pdf-parse returns almost
+// nothing — without this guard we'd send an empty string to Gemini and get
+// nonsense back, marked "complete".
+const MIN_TEXT_CHARS = 20;
+
 // Process an uploaded document into dyslexia-friendly structured content:
 //   1. download the file from storage
 //   2. extract text (PDF/DOCX) or hand the image to Gemini's vision
@@ -37,15 +43,26 @@ export async function processDocument(documentId: string) {
     // Turn the file into something Gemini can format.
     let content: ProcessedDocument;
     if (doc.file_type === "pdf") {
-      content = await formatStudyNotes({
-        kind: "text",
-        text: await extractPdfText(buffer),
-      });
+      const text = await extractPdfText(buffer);
+      if (text.trim().length >= MIN_TEXT_CHARS) {
+        content = await formatStudyNotes({ kind: "text", text });
+      } else {
+        // Likely a scanned/photographed PDF with no embedded text — hand the
+        // raw PDF to Gemini's vision so it can read the text off the page.
+        content = await formatStudyNotes({
+          kind: "image",
+          mimeType: "application/pdf",
+          base64: buffer.toString("base64"),
+        });
+      }
     } else if (doc.file_type === "docx") {
-      content = await formatStudyNotes({
-        kind: "text",
-        text: await extractDocxText(buffer),
-      });
+      const text = await extractDocxText(buffer);
+      if (text.trim().length < MIN_TEXT_CHARS) {
+        throw new Error(
+          "This document looks empty — we couldn't find any text to work with.",
+        );
+      }
+      content = await formatStudyNotes({ kind: "text", text });
     } else {
       // image — let Gemini read the text directly
       content = await formatStudyNotes({

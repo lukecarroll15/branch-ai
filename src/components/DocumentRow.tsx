@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import RetryButton from "@/components/RetryButton";
 import type { DocumentRow as DocumentRowData } from "@/lib/types";
 
 type Doc = Pick<DocumentRowData, "id" | "title" | "status" | "created_at">;
@@ -74,6 +75,14 @@ export default function DocumentRow({ doc }: { doc: Doc }) {
           </span>
           <StatusBadge status={doc.status} />
         </Link>
+
+        {doc.status === "error" && (
+          <RetryButton
+            documentId={doc.id}
+            label="Try again"
+            className="rounded-xl border border-border px-3 py-2 text-sm font-bold text-primary transition-colors hover:border-primary disabled:opacity-60"
+          />
+        )}
 
         <button
           type="button"

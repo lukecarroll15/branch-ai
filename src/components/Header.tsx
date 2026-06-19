@@ -36,10 +36,10 @@ export default async function Header() {
         {/* Brand — links home */}
         <Link href="/" className="flex items-center">
           <Image
-            src="/branchai.png"
+            src="/logo.png"
             alt="Branch"
-            width={833}
-            height={469}
+            width={5834}
+            height={4500}
             priority
             className="h-10 w-auto"
           />
@@ -71,20 +71,12 @@ export default async function Header() {
             </button>
           </form>
         ) : (
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="hidden rounded-lg px-4 py-2 text-base font-bold text-primary-deep transition-colors hover:bg-primary/10 sm:inline-block"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="rounded-xl bg-primary px-5 py-2.5 text-base font-bold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5 hover:opacity-95"
-            >
-              Sign up
-            </Link>
-          </div>
+          <Link
+            href="/login"
+            className="rounded-xl bg-primary px-5 py-2.5 text-base font-bold text-primary-foreground shadow-soft transition-transform hover:-translate-y-0.5 hover:opacity-95"
+          >
+            Log in
+          </Link>
         )}
       </div>
     </header>

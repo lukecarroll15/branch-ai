@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { login } from "@/lib/actions/auth";
 
 export default async function LoginPage({
@@ -66,13 +65,6 @@ export default async function LoginPage({
             Log in
           </button>
         </form>
-
-        <p className="mt-6 text-center text-base text-muted">
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" className="font-bold text-primary hover:underline">
-            Sign up
-          </Link>
-        </p>
 
         <p className="mt-6 flex items-center justify-center gap-2 border-t border-border pt-6 text-sm text-muted">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="h-4 w-4 text-primary-light">

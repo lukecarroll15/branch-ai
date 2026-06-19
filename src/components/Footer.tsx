@@ -38,7 +38,6 @@ const footerSections: FooterSection[] = [
     heading: "Get started",
     links: [
       { label: "Log in", href: "/login" },
-      { label: "Create an account", href: "/signup" },
     ],
   },
 ];
@@ -57,10 +56,10 @@ export default function Footer() {
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="flex items-center">
               <Image
-                src="/logo.svg"
+                src="/logo.png"
                 alt="Branch"
-                width={720}
-                height={400}
+                width={5834}
+                height={4500}
                 className="h-10 w-auto"
               />
             </Link>

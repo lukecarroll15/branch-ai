@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import DocumentContent from "@/components/DocumentContent";
 import ProcessingState from "@/components/ProcessingState";
+import RetryButton from "@/components/RetryButton";
 import { createClient } from "@/lib/supabase/server";
 import type { DocumentRow } from "@/lib/types";
 
@@ -51,10 +52,15 @@ export default async function DocumentPage({
             </div>
           </>
         ) : doc.status === "error" ? (
-          <p className="mt-6 rounded-xl border border-tile-red-border bg-tile-red px-4 py-3 text-base">
-            Something went wrong processing this document. Try uploading it
-            again.
-          </p>
+          <div className="mt-6 flex flex-col gap-4">
+            <p className="rounded-xl border border-tile-red-border bg-tile-red px-4 py-3 text-base">
+              Something went wrong processing this document. You can try again —
+              it uses the file you already uploaded.
+            </p>
+            <div>
+              <RetryButton documentId={doc.id} />
+            </div>
+          </div>
         ) : (
           <ProcessingState />
         )}

@@ -216,14 +216,62 @@ function Term({
   onToggle,
   onOpen,
   onClose,
+  ghost = false,
 }: {
   data: TermData;
   open: boolean;
   onToggle: () => void;
   onOpen: () => void;
   onClose: () => void;
+  // `ghost` terms are the invisible height-reservation copies. They must NOT
+  // render the popover: an open popover sets `visibility:visible`, which would
+  // override the ghost's hidden state and show a mirrored duplicate once the
+  // deck is flipped (the ghost sits in the rotated 3D container).
+  ghost?: boolean;
 }) {
   const tier = TIER[data.tier];
+  const tipRef = useRef<HTMLSpanElement>(null);
+  // Horizontal nudge (px) applied on top of the centred position so a term near
+  // the card's edge doesn't push its popover outside the card. Measured on open.
+  const [shift, setShift] = useState(0);
+
+  useEffect(() => {
+    if (!open) return;
+    // Defer measuring to the next frame (matches the reduced-motion effect's
+    // pattern and avoids a synchronous setState inside the effect body).
+    const raf = requestAnimationFrame(() => {
+      const el = tipRef.current;
+      if (!el) return;
+      const card = el.closest("#preview");
+      const bounds = card
+        ? card.getBoundingClientRect()
+        : { left: 0, right: window.innerWidth };
+      const margin = 12;
+      const rect = el.getBoundingClientRect();
+      setShift((prev) => {
+        // Where the popover would sit with no nudge, then pull it back inside.
+        const left = rect.left - prev;
+        const right = rect.right - prev;
+        let dx = 0;
+        if (left < bounds.left + margin) dx = bounds.left + margin - left;
+        else if (right > bounds.right - margin) dx = bounds.right - margin - right;
+        return Math.round(dx);
+      });
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [open]);
+
+  // Height-reservation copy only: same text/sizing, no popover, no interaction.
+  if (ghost) {
+    return (
+      <span
+        className={`relative inline whitespace-nowrap rounded px-1 font-medium underline decoration-2 underline-offset-[3px] ${tier.term}`}
+      >
+        {data.text}
+      </span>
+    );
+  }
+
   return (
     <span
       className={`relative inline cursor-pointer whitespace-nowrap rounded px-1 font-medium underline decoration-2 underline-offset-[3px] transition-colors ${tier.term} ${
@@ -238,10 +286,14 @@ function Term({
     >
       {data.text}
       <span
-        className={`absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-60 -translate-x-1/2 rounded-2xl bg-primary-deep p-4 text-left shadow-soft-lg transition-all ${
-          open
-            ? "visible translate-y-0 opacity-100"
-            : "invisible translate-y-1.5 opacity-0"
+        ref={tipRef}
+        style={{
+          transform: `translateX(calc(-50% + ${shift}px)) translateY(${
+            open ? "0" : "6px"
+          })`,
+        }}
+        className={`absolute bottom-[calc(100%+12px)] left-1/2 z-20 w-60 max-w-[calc(100vw-2rem)] rounded-2xl bg-primary-deep p-4 text-left shadow-soft-lg transition-all ${
+          open ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >
         <span className="block text-base font-bold tracking-wide text-gold-soft">
@@ -254,8 +306,12 @@ function Term({
           <SpeakerIcon />
           Tap to hear it
         </span>
-        {/* arrow */}
-        <span className="absolute left-1/2 top-full -translate-x-1/2 border-[7px] border-transparent border-t-primary-deep" />
+        {/* arrow — counter-shifted so it keeps pointing at the term even when
+            the popover has been nudged sideways to stay inside the card. */}
+        <span
+          style={{ transform: `translateX(calc(-50% - ${shift}px))` }}
+          className="absolute left-1/2 top-full border-[7px] border-transparent border-t-primary-deep"
+        />
       </span>
     </span>
   );
@@ -300,7 +356,7 @@ function NoteFace({
           typeof seg === "string" ? (
             <span key={i}>{seg}</span>
           ) : (
-            <Term key={seg.id} {...termProps(seg)} />
+            <Term key={seg.id} {...termProps(seg)} ghost={ghost} />
           ),
         )}
       </p>

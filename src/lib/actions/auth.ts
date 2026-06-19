@@ -21,33 +21,11 @@ export async function login(formData: FormData) {
   redirect("/dashboard");
 }
 
-// Create an account with email + password. On failure we redirect back to
-// /signup with the error message in the query string. On success, Supabase
-// either returns a session (email confirmation off) — in which case we go
-// straight to the dashboard — or sends a confirmation email, in which case we
-// send the user to /login with a notice to check their inbox.
-export async function signup(formData: FormData) {
-  const email = String(formData.get("email") ?? "");
-  const password = String(formData.get("password") ?? "");
-
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({ email, password });
-
-  if (error) {
-    redirect(`/signup?error=${encodeURIComponent(error.message)}`);
-  }
-
-  if (data.session) {
-    revalidatePath("/", "layout");
-    redirect("/dashboard");
-  }
-
-  redirect(
-    `/login?message=${encodeURIComponent(
-      "Check your email to confirm your account.",
-    )}`,
-  );
-}
+// NOTE: Public sign-up is intentionally disabled for the pilot. Pilot students
+// are provisioned by an admin in Supabase (create the user with "Auto Confirm"
+// so there's no email step). /signup redirects to /login. If self-serve signup
+// is ever needed again, re-add a `signup` action here that calls
+// supabase.auth.signUp.
 
 // Sign out and return to the login page.
 export async function logout() {
