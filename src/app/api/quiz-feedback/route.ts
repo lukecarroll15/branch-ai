@@ -1,26 +1,17 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { apiError, findOwnedDocument, readJson, requireUser } from "@/lib/api";
 
 // POST /api/quiz-feedback — record whether a quiz question felt easy or hard.
 // One row per (student, document, question); re-submitting updates the rating.
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const auth = await requireUser();
+  if ("error" in auth) return auth.error;
+  const { supabase, user } = auth;
 
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const parsed = await readJson(request);
+  if ("error" in parsed) return parsed.error;
 
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-  }
-
-  const { documentId, questionIndex, rating } = (body ?? {}) as {
+  const { documentId, questionIndex, rating } = (parsed.body ?? {}) as {
     documentId?: unknown;
     questionIndex?: unknown;
     rating?: unknown;
@@ -33,19 +24,12 @@ export async function POST(request: Request) {
     questionIndex < 0 ||
     (rating !== "easy" && rating !== "hard")
   ) {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return apiError("Invalid request", 400);
   }
 
-  // Confirm the document belongs to this student (RLS scopes the select).
-  const { data: doc } = await supabase
-    .from("documents")
-    .select("id")
-    .eq("id", documentId)
-    .single();
-
-  if (!doc) {
-    return NextResponse.json({ error: "Document not found" }, { status: 404 });
-  }
+  // Confirm the document belongs to this student.
+  const found = await findOwnedDocument(supabase, documentId, user.id);
+  if ("error" in found) return found.error;
 
   const { error } = await supabase.from("quiz_feedback").upsert(
     {
@@ -58,7 +42,7 @@ export async function POST(request: Request) {
   );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return apiError(error.message, 500);
   }
 
   return NextResponse.json({ ok: true });

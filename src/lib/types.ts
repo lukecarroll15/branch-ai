@@ -7,7 +7,7 @@ export type TileColor = "lavender" | "orange" | "red" | "teal";
 // "heading" starts a new topic (the card title); "key_point" is the one-line
 // takeaway shown under a heading while the card is collapsed. Together they give
 // the document a scannable spine so it reads as study cards, not a wall of prose.
-export type SectionType =
+type SectionType =
   | "heading"
   | "key_point"
   | "paragraph"
@@ -39,7 +39,7 @@ export interface ProcessedDocument {
   sections: Section[];
 }
 
-export type DocumentStatus = "processing" | "complete" | "error";
+type DocumentStatus = "processing" | "complete" | "error";
 
 // A row from the `documents` table (see supabase/schema.sql).
 export interface DocumentRow {

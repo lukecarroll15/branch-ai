@@ -1,5 +1,5 @@
 import { NextResponse, after } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { apiError, requireUser } from "@/lib/api";
 import { processDocument } from "@/lib/process";
 
 // Give the post-response processing work (download + extract + Gemini) room to
@@ -20,34 +20,26 @@ const TYPE_MAP: Record<string, "pdf" | "image" | "docx"> = {
 };
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const auth = await requireUser();
+  if ("error" in auth) return auth.error;
+  const { supabase, user } = auth;
 
   const formData = await request.formData();
   const file = formData.get("file");
 
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+    return apiError("No file provided", 400);
   }
 
   if (file.size > MAX_FILE_BYTES) {
-    return NextResponse.json(
-      { error: "That file is too big. Please upload a file under 10 MB." },
-      { status: 400 },
-    );
+    return apiError("That file is too big. Please upload a file under 10 MB.", 400);
   }
 
   const fileType = TYPE_MAP[file.type];
   if (!fileType) {
-    return NextResponse.json(
-      { error: "Unsupported file type. Use a PDF, image (JPG/PNG), or Word doc." },
-      { status: 400 },
+    return apiError(
+      "Unsupported file type. Use a PDF, image (JPG/PNG), or Word doc.",
+      400,
     );
   }
 
@@ -60,7 +52,7 @@ export async function POST(request: Request) {
     .upload(path, file, { contentType: file.type });
 
   if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    return apiError(uploadError.message, 500);
   }
 
   // Title defaults to the filename without its extension.
@@ -79,9 +71,9 @@ export async function POST(request: Request) {
     .single();
 
   if (insertError || !doc) {
-    return NextResponse.json(
-      { error: insertError?.message ?? "Could not create document record." },
-      { status: 500 },
+    return apiError(
+      insertError?.message ?? "Could not create document record.",
+      500,
     );
   }
 

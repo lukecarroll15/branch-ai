@@ -1,5 +1,5 @@
 import { NextResponse, after } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { apiError, requireOwnedDocument } from "@/lib/api";
 import { processDocument } from "@/lib/process";
 
 // Give the reprocess work (download + extract + Gemini) room to run on Vercel
@@ -14,34 +14,12 @@ export async function POST(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  // RLS already scopes this to the current user; we filter explicitly too.
-  const { data: doc, error: fetchError } = await supabase
-    .from("documents")
-    .select("id, file_path")
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .single();
-
-  if (fetchError || !doc) {
-    return NextResponse.json({ error: "Document not found" }, { status: 404 });
-  }
+  const ctx = await requireOwnedDocument(params);
+  if ("error" in ctx) return ctx.error;
+  const { id, supabase, user, doc } = ctx;
 
   if (!doc.file_path) {
-    return NextResponse.json(
-      { error: "This document has no file to process again." },
-      { status: 400 },
-    );
+    return apiError("This document has no file to process again.", 400);
   }
 
   // Flip back to "processing" so the page shows the spinner and polls. Then
@@ -54,7 +32,7 @@ export async function POST(
     .eq("user_id", user.id);
 
   if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
+    return apiError(updateError.message, 500);
   }
 
   after(async () => {
@@ -73,29 +51,10 @@ export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
-
-  // Look up the row first so we know which storage object to remove. RLS
-  // already scopes this to the current user, but we filter explicitly too.
-  const { data: doc, error: fetchError } = await supabase
-    .from("documents")
-    .select("id, file_path")
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .single();
-
-  if (fetchError || !doc) {
-    return NextResponse.json({ error: "Document not found" }, { status: 404 });
-  }
+  // The lookup also tells us which storage object to remove.
+  const ctx = await requireOwnedDocument(params);
+  if ("error" in ctx) return ctx.error;
+  const { id, supabase, user, doc } = ctx;
 
   // Remove the stored file first. If this fails we stop, otherwise we'd be
   // left with an orphaned file and no row pointing at it.
@@ -105,7 +64,7 @@ export async function DELETE(
       .remove([doc.file_path]);
 
     if (storageError) {
-      return NextResponse.json({ error: storageError.message }, { status: 500 });
+      return apiError(storageError.message, 500);
     }
   }
 
@@ -116,7 +75,7 @@ export async function DELETE(
     .eq("user_id", user.id);
 
   if (deleteError) {
-    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    return apiError(deleteError.message, 500);
   }
 
   return NextResponse.json({ ok: true });
